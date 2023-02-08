@@ -18,8 +18,12 @@ namespace MimeDetective
         static MimeTypes()
         {
             types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
-                BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
-                AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE };
+                BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, LZMA, LZ4,
+                OGG, ICO, WEBP, XML, MIDI, FLV, WAVE, MP3_ID3, MP3, AIFF, FLAC, DWG, LIB_COFF, PST, PSD, MP4_0, MP4_1, AVI, MKV,
+                BMP2X, BMP3D, BMPCUBE,
+                TTF, OTC, WOFF, WOFF2,
+                AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE,
+                MESHX };
         }
 
         #region Constants
@@ -61,13 +65,27 @@ namespace MimeDetective
         #endregion
 
         // graphics
-        #region Graphics jpeg, png, gif, bmp, ico
+        #region Graphics jpeg, png, gif, bmp, ico, webp
 
         public readonly static FileType JPEG = new FileType(new byte?[] { 0xFF, 0xD8, 0xFF }, "jpg", "image/jpeg");
         public readonly static FileType PNG = new FileType(new byte?[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, "png", "image/png");
         public readonly static FileType GIF = new FileType(new byte?[] { 0x47, 0x49, 0x46, 0x38, null, 0x61 }, "gif", "image/gif");
         public readonly static FileType BMP = new FileType(new byte?[] { 66, 77 }, "bmp", "image/gif");
         public readonly static FileType ICO = new FileType(new byte?[] { 0, 0, 1, 0 }, "ico", "image/x-icon");
+        public readonly static FileType WEBP = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x57, 0x45, 0x42, 0x50 }, "webp", "image/webp");
+
+        public readonly static FileType BMP2X = new FileType(new byte?[] { null, 0x42, 0x6D, 0x70, 0x32, 0x58 }, "bmp2x", "image/bitmapx");
+        public readonly static FileType BMP3D = new FileType(new byte?[] { null, 0x42, 0x6D, 0x70, 0x33, 0x44 }, "bmp3d", "volume/bitmapx");
+        public readonly static FileType BMPCUBE = new FileType(new byte?[] { null, 0x42, 0x6D, 0x70, 0x43, 0x75, 0x62, 0x65 }, "bmpcube", "cubemap/bitmapx");
+
+        #endregion
+
+        #region Fonts
+
+        public readonly static FileType TTF = new FileType(new byte?[] { 0x00, 0x01, 0x00, 0x00, 0x00 }, "ttf", "font/ttf");
+        public readonly static FileType OTC = new FileType(new byte?[] { 0x4F, 0x54, 0x54, 0x4F }, "otc", "font/otc");
+        public readonly static FileType WOFF = new FileType(new byte?[] { 0x77, 0x4F, 0x46, 0x46 }, "woff", "font/woff");
+        public readonly static FileType WOFF2 = new FileType(new byte?[] { 0x77, 0x4F, 0x46, 0x32 }, "woff2", "font/woff2");
 
         #endregion
 
@@ -82,6 +100,9 @@ namespace MimeDetective
         public readonly static FileType ZIP = new FileType(new byte?[] { 0x50, 0x4B, 0x03, 0x04 }, "zip", "application/x-compressed");
         public readonly static FileType RAR = new FileType(new byte?[] { 0x52, 0x61, 0x72, 0x21 }, "rar", "application/x-compressed");
         public readonly static FileType DLL_EXE = new FileType(new byte?[] { 0x4D, 0x5A }, "dll, exe", "application/octet-stream");
+
+        public readonly static FileType LZMA = new FileType(new byte?[] { 0x5D, 0x00, 0x00, 0x20, 0x00 }, "lzma", "application/x-lzma-stream");
+        public readonly static FileType LZ4 = new FileType(new byte?[] { 0x02 }, "lz4", "application/x-lz4-stream");
 
         //Compressed tape archive file using standard (Lempel-Ziv-Welch) compression
         public readonly static FileType TAR_ZV = new FileType(new byte?[] { 0x1F, 0x9D }, "tar.z", "application/x-tar");
@@ -99,7 +120,7 @@ namespace MimeDetective
         #region Media ogg, midi, flv, dwg, pst, psd
 
         // media 
-        public readonly static FileType OGG = new FileType(new byte?[] { 103, 103, 83, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0 }, "oga,ogg,ogv,ogx", "application/ogg");
+        public readonly static FileType OGG = new FileType(new byte?[] { 0x4F, 0x67, 0x67, 0x53 }, "ogg,oga,ogv,ogx", "application/ogg");
         //MID, MIDI	 	Musical Instrument Digital Interface (MIDI) sound file
         public readonly static FileType MIDI = new FileType(new byte?[] { 0x4D, 0x54, 0x68, 0x64 }, "midi,mid", "audio/midi");
 
@@ -109,7 +130,25 @@ namespace MimeDetective
         //WAV	 	Resource Interchange File Format -- Audio for Windows file, where xx xx xx xx is the file size (little endian), audio/wav audio/x-wav
 
         public readonly static FileType WAVE = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 
-                                                            0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20	}, "wav", "audio/wav");
+                                                            0x57, 0x41, 0x56, 0x45	}, "wav", "audio/wav");
+
+        public readonly static FileType MP3_ID3 = new FileType(new byte?[] { 0x49, 0x44, 0x33, 0x03 }, "mp3", "audio/mpeg");
+
+        public readonly static FileType MP3 = new FileType(new byte?[] { 0xFF, 0xFB, null, null,   null, null, null, null,   null, null, null, null,   null, null, null, null,
+         null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+         null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, 0x4C, 0x41, 0x4D, 0x45, },
+            "mp3", "audio/mpeg");
+
+        public readonly static FileType FLAC = new FileType(new byte?[] { 0x66, 0x4C, 0x61, 0x43 }, "flac", "audio/flac");
+
+        public readonly static FileType AIFF = new FileType(new byte?[] { 0x46, 0x4F, 0x52, 0x4D, null, null, null, null, 0x41, 0x49, 0x46, 0x46 }, "aiff", "audio/aiff");
 
         public readonly static FileType PST = new FileType(new byte?[] { 0x21, 0x42, 0x44, 0x4E }, "pst", "application/octet-stream");
 
@@ -118,6 +157,18 @@ namespace MimeDetective
 
         //Photoshop image file
         public readonly static FileType PSD = new FileType(new byte?[] { 0x38, 0x42, 0x50, 0x53 }, "psd", "application/octet-stream");
+
+        // MP4
+        public readonly static FileType MP4_0 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70 }, "mp4", "video/mp4");
+        public readonly static FileType MP4_1 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70 }, "mp4", "video/mp4");
+        //public readonly static FileType MP4_MP42 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x14, 0x6D, 0x70, 0x34, 0x32 }, "mp4", "video/mp4");
+
+        // MKV
+        public readonly static FileType MKV = new FileType(new byte?[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+           null, null, null, null, null, null, null, null, 0x6D, 0x61, 0x74, 0x72, 0x6F, 0x73, 0x6B, 0x61 }, "mkv", "video/x-matroska");
+
+        // AVI
+        public readonly static FileType AVI = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x41, 0x56, 0x49, 0x20 }, "avi", "video/avi");
 
         #endregion
 
@@ -137,6 +188,12 @@ namespace MimeDetective
         //PKR	 	PGP public keyring file
         public readonly static FileType PKR = new FileType(new byte?[] { 0x99, 0x01 }, "pkr", "application/octet-stream");
 
+
+        #endregion
+
+        #region Models
+
+        public readonly static FileType MESHX = new FileType(new byte?[] { 0x05, 0x4D, 0x65, 0x73, 0x68, 0x58 }, "meshx", "application/meshx");
 
         #endregion
 
@@ -196,10 +253,10 @@ namespace MimeDetective
         /// </remarks>
         /// <param name="file">The FileInfo object.</param>
         /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(this byte[] bytes)
-        {
-            return GetFileType(new MemoryStream(bytes));
-        }
+        //public static FileType GetFileType(this byte[] bytes)
+        //{
+        //    return GetFileType(bytes);
+        //}
 
         /// <summary>
         /// Read header of a stream and depending on the information in the header
@@ -209,25 +266,44 @@ namespace MimeDetective
         /// </summary>
         /// <param name="file">The FileInfo object.</param>
         /// <returns>FileType or null not identified</returns>
+        public static async Task<FileType> GetFileTypeAsync(this Stream stream)
+        {
+            return GetFileType(await ReadHeaderAsync(stream).ConfigureAwait(false));
+
+            //FileType fileType = null;
+            //var fileName = Path.GetTempFileName();
+
+            //try
+            //{
+            //    using (var fileStream = File.Create(fileName))
+            //    {
+            //        stream.Seek(0, SeekOrigin.Begin);
+            //        stream.CopyTo(fileStream);
+            //    }
+            //    fileType = GetFileType(new FileInfo(fileName));
+            //}
+            //finally
+            //{
+            //    File.Delete(fileName);
+            //}
+            //return fileType;
+        }
+
+        public static async Task<byte[]> ReadHeaderAsync(this Stream stream)
+        {
+            var data = new byte[Math.Min((int)(stream.Length - stream.Position), MaxHeaderSize)];
+            await stream.ReadAsync(data, 0, data.Length).ConfigureAwait(false);
+
+            return data;
+        }
+
         public static FileType GetFileType(this Stream stream)
         {
-            FileType fileType = null;
-            var fileName = Path.GetTempFileName();
+            var data = new byte[Math.Min((int)(stream.Length - stream.Position), MaxHeaderSize)];
 
-            try
-            {
-                using (var fileStream = File.Create(fileName))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
-                }
-                fileType = GetFileType(new FileInfo(fileName));
-            }
-            finally
-            {
-                File.Delete(fileName);
-            }
-            return fileType;
+            stream.Read(data, 0, data.Length);
+
+            return GetFileType(data);
         }
 
         /// <summary>
@@ -240,7 +316,7 @@ namespace MimeDetective
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this FileInfo file)
         {
-            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize), file.FullName);
+            return GetFileType(ReadFileHeader(file, MaxHeaderSize), file.FullName);
         }
 
         /// <summary>
@@ -252,40 +328,39 @@ namespace MimeDetective
         /// <param name="fileHeaderReadFunc">A function which returns the bytes found</param>
         /// <param name="fileFullName">If given and file typ is a zip file, a check for docx and xlsx is done</param>
         /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc, string fileFullName = "")
+        public static FileType GetFileType(byte[] fileHeader, string fileFullName = "")
         {
             // if none of the types match, return null
             FileType fileType = null;
 
-            // read first n-bytes from the file
-            byte[] fileHeader = fileHeaderReadFunc();
+            //// read first n-bytes from the file
+            //byte[] fileHeader = fileHeaderReadFunc();
 
             // checking if it's binary (not really exact, but should do the job)
             // shouldn't work with UTF-16 OR UTF-32 files
-            if (!fileHeader.Any(b => b == 0))
+            
+            // compare the file header to the stored file headers
+            foreach (FileType type in types)
             {
-                fileType = TXT;
-            }
-            else
-            {
-                // compare the file header to the stored file headers
-                foreach (FileType type in types)
-                {
-                    int matchingCount = GetFileMatchingCount(fileHeader, type);
-                    if (matchingCount == type.Header.Length)
-                    {
-                        // check for docx and xlsx only if a file name is given
-                        // there may be situations where the file name is not given
-                        // or it is unpracticable to write a temp file to get the FileInfo
-                        if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
-                            fileType = CheckForDocxAndXlsx(type, fileFullName);
-                        else
-                            fileType = type;    // if all the bytes match, return the type
+                int matchingCount = GetFileMatchingCount(fileHeader, type);
 
-                        break;
-                    }
+                if (matchingCount == type.Header.Length)
+                {
+                    // check for docx and xlsx only if a file name is given
+                    // there may be situations where the file name is not given
+                    // or it is unpracticable to write a temp file to get the FileInfo
+                    if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
+                        fileType = CheckForDocxAndXlsx(type, fileFullName);
+                    else
+                        fileType = type;    // if all the bytes match, return the type
+
+                    break;
                 }
             }
+
+            if (fileType == null && !fileHeader.Any(b => b == 0))
+                fileType = TXT;
+
             return fileType;
         }
 
@@ -386,11 +461,14 @@ namespace MimeDetective
         private static int GetFileMatchingCount(byte[] fileHeader, FileType type)
         {
             int matchingCount = 0;
+
             for (int i = 0; i < type.Header.Length; i++)
             {
                 // if file offset is not set to zero, we need to take this into account when comparing.
                 // if byte in type.header is set to null, means this byte is variable, ignore it
-                if (type.Header[i] != null && type.Header[i] != fileHeader[i + type.HeaderOffset])
+                int searchIndex = i + type.HeaderOffset;
+
+                if (type.Header[i] != null && (searchIndex >= fileHeader.Length || type.Header[i] != fileHeader[searchIndex]))
                 {
                     // if one of the bytes does not match, move on to the next type
                     matchingCount = 0;
@@ -412,7 +490,7 @@ namespace MimeDetective
         /// <returns>Array of bytes</returns>
         private static Byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
         {
-            Byte[] header = new byte[MaxHeaderSize];
+            byte[] header = new byte[MaxHeaderSize];
             try  // read file
             {
                 using (FileStream fsSource = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
