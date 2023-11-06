@@ -1,5 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Company>Muraad</Company>
+    <Authors>Muraad, Yellow Dog Man Studios</Authors>
+    <PackageId>YellowDogMan.MimeDetective</PackageId>
+    <Description>Fork of Muraad's Mime Detective Library. This library can detect the file and mime types of various files using analysis.</Description>
+    <Copyright>Copyright (c) 2015 - The MimeDetective developer</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Yellow-Dog-Man/Mime-Detective</RepositoryUrl>
+    <PackageProjectURL>https://github.com/Yellow-Dog-Man/Mime-Detective</PackageProjectURL>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>mime detective</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -52,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="UnusedFileTypes.txt" />
