@@ -19,7 +19,7 @@ namespace MimeDetective
         {
             types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, LZMA, LZ4,
-                OGG, ICO, WEBP, XML, MIDI, FLV, WAVE, MP3_ID3, MP3, AIFF, FLAC, DWG, LIB_COFF, PST, PSD, MP4_0, MP4_1, AVI, MKV,
+                OGG, ICO, WEBP, DDS, XML, MIDI, FLV, WAVE, MP3_ID3, MP3, AIFF, FLAC, DWG, LIB_COFF, PST, PSD, MP4_0, MP4_1, AVI, MKV,
                 BMP2X, BMP3D, BMPCUBE,
                 TTF, OTC, WOFF, WOFF2,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE,
@@ -73,6 +73,7 @@ namespace MimeDetective
         public readonly static FileType BMP = new FileType(new byte?[] { 66, 77 }, "bmp", "image/bmp");
         public readonly static FileType ICO = new FileType(new byte?[] { 0, 0, 1, 0 }, "ico", "image/x-icon");
         public readonly static FileType WEBP = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x57, 0x45, 0x42, 0x50 }, "webp", "image/webp");
+        public readonly static FileType DDS = new FileType(new byte?[] { 0x44, 0x44, 0x53, 0x20, 0x7C }, "dds", "image/vnd.ms-dds");
 
         public readonly static FileType BMP2X = new FileType(new byte?[] { null, 0x42, 0x6D, 0x70, 0x32, 0x58 }, "bmp2x", "image/bitmapx");
         public readonly static FileType BMP3D = new FileType(new byte?[] { null, 0x42, 0x6D, 0x70, 0x33, 0x44 }, "bmp3d", "volume/bitmapx");
