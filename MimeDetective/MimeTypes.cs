@@ -14,6 +14,7 @@ namespace MimeDetective
     {
         // all the file types to be put into one list
         public static List<FileType> types;
+        public static List<FileType> gzipTypes;
 
         static MimeTypes()
         {
@@ -23,7 +24,13 @@ namespace MimeDetective
                 BMP2X, BMP3D, BMPCUBE,
                 TTF, OTC, WOFF, WOFF2,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE,
-                MESHX };
+                MESHX,
+                FRSPLT };
+
+            gzipTypes = new List<FileType>
+            {
+                SPZ
+            };
         }
 
         #region Constants
@@ -198,6 +205,13 @@ namespace MimeDetective
 
         #endregion
 
+        #region GAUSSIAN SPLATS
+
+        public readonly static FileType FRSPLT = new FileType(new byte?[] { 0x06, 0x46, 0x72, 0x53, 0x70, 0x6C, 0x74 }, "frsplt", "gaussian-splat/froox-splat");
+        public readonly static FileType SPZ = new FileType(new byte?[] { 0x4e, 0x47, 0x53, 0x50  }, "spz", "gaussian-splat/niantic");
+
+        #endregion
+
         /*
          * 46 72 6F 6D 20 20 20 or	 	From
         46 72 6F 6D 20 3F 3F 3F or	 	From ???
@@ -213,7 +227,9 @@ namespace MimeDetective
         public readonly static FileType ELF = new FileType(new byte?[] { 0x45, 0x6C, 0x66, 0x46, 0x69, 0x6C, 0x65, 0x00 }, "elf", "text/plain");
 
         // number of bytes we read from a file
-        public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
+        // This is set to 32 kB, because some files ( SPZ >:I ) have their header in compressed stream, and this is safe, but still small
+        // value to read, which should be enough to decompress the header
+        public const int MaxHeaderSize = 32 * 1024;
        
         #endregion
 
@@ -350,8 +366,10 @@ namespace MimeDetective
                     // check for docx and xlsx only if a file name is given
                     // there may be situations where the file name is not given
                     // or it is unpracticable to write a temp file to get the FileInfo
-                    if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
-                        fileType = CheckForDocxAndXlsx(type, fileFullName);
+                    if (type.Equals(ZIP))
+                        fileType = CheckForDocxAndXlsx(type, fileHeader);
+                    else if (type.Equals(GZ_TGZ))
+                        fileType = CheckForGZIP(fileHeader);
                     else
                         fileType = type;    // if all the bytes match, return the type
 
@@ -422,26 +440,35 @@ namespace MimeDetective
             return result;
         }
 
-        private static FileType CheckForDocxAndXlsx(FileType type, string fileFullName)
+        private static FileType CheckForDocxAndXlsx(FileType type, byte[] header)
         {
-            FileType result = null;
+            FileType result = type;
 
             //check for docx and xlsx
-            using (var zipFile = ZipFile.OpenRead(fileFullName))
+            try
             {
-                if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
-                    result = WORDX;
-                else if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
-                    result = EXCELX;
-                else
-                    result = CheckForOdtAndOds(result, zipFile);
+                using (var zipFile = new ZipArchive(new MemoryStream(header), ZipArchiveMode.Read))
+                {
+                    if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
+                        result = WORDX;
+                    else if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
+                        result = EXCELX;
+                    else
+                        result = CheckForOdtAndOds(result, zipFile);
+                }
             }
+            catch
+            {
+
+            }
+
             return result;
         }
 
         private static FileType CheckForOdtAndOds(FileType result, ZipArchive zipFile)
         {
             var ooMimeType = zipFile.Entries.FirstOrDefault(e => e.FullName == "mimetype");
+
             if (ooMimeType != null)
             {
                 using (var textReader = new StreamReader(ooMimeType.Open()))
@@ -457,6 +484,33 @@ namespace MimeDetective
             }
 
             return result;
+        }
+
+        private static FileType CheckForGZIP(byte[] fileHeader)
+        {
+            try
+            {
+                using(var gzip = new GZipStream(new MemoryStream(fileHeader), CompressionMode.Decompress))
+                {
+                    var subHeader = new byte[1024];
+                    gzip.Read(subHeader, 0, subHeader.Length);
+
+                    foreach(var type in gzipTypes)
+                    {
+                        var matchingCount = GetFileMatchingCount(subHeader, type);
+
+                        if (matchingCount == type.Header.Length)
+                            return type;
+                    }
+                }
+            }
+            catch
+            {
+                // We just ignore exceptions and assume there's not a deeper structure we can analyze
+            }
+
+            // If all failed, let's just consider it the plain GZIP
+            return GZ_TGZ;
         }
 
         private static int GetFileMatchingCount(byte[] fileHeader, FileType type)
