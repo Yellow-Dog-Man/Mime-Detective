@@ -20,7 +20,7 @@ namespace MimeDetective
         {
             types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, LZMA, LZ4,
-                OGG, ICO, WEBP, DDS, XML, MIDI, FLV, WAVE, MP3_ID3, MP3, AIFF, FLAC, DWG, LIB_COFF, PST, PSD, MP4_0, MP4_1, AVI, MKV,
+                OGG, ICO, WEBP, DDS, XML, MIDI, FLV, WAVE, MP3_ID3, MP3, AIFF, FLAC, DWG, LIB_COFF, PST, PSD, MP4_0, MP4_1, MP4_2, AVI, MKV,
                 BMP2X, BMP3D, BMPCUBE,
                 TTF, OTC, WOFF, WOFF2,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE,
@@ -169,7 +169,8 @@ namespace MimeDetective
         // MP4
         public readonly static FileType MP4_0 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70 }, "mp4", "video/mp4");
         public readonly static FileType MP4_1 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70 }, "mp4", "video/mp4");
-        //public readonly static FileType MP4_MP42 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x14, 0x6D, 0x70, 0x34, 0x32 }, "mp4", "video/mp4");
+        //                                                                                         ftypisom
+        public readonly static FileType MP4_2 = new FileType(new byte?[] { null, null, null, null, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D }, "mp4", "video/mp4");
 
         // MKV
         public readonly static FileType MKV = new FileType(new byte?[] { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
